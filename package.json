@@ -2,7 +2,7 @@
   "name": "com.unity.profiling.systemmetrics.mali",
   "displayName": "System Metrics Mali",
   "description": "The System Metrics package provides access to low-level system or hardware performance metrics on ARM Mali devices. It enables applications to make performance-relevant measurements in development and runtime using ProfilerRecorder API.\n\nBy installing this package, you agree to the terms and conditions of the Unity End User License Agreement found under \"View licenses\" above.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "unity": "2021.2",
   "keywords": [
     "mobile",
@@ -20,11 +20,11 @@
     }
   ],
   "upmCi": {
-    "footprint": "79f0f685daed6230b3be09a6fe3c855ce7fe6d67"
+    "footprint": "5be5033dc00f519f8ef5165e71547fb53d280f58"
   },
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/com.unity.profiling.systemmetrics.git",
     "type": "git",
-    "revision": "2d8bd79341c1295d1975180094b7cedd2ac2ed71"
+    "revision": "1073a3cec2f0a3ab82b243e1cbf440865e1b4275"
   }
 }

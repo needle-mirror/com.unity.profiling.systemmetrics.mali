@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Unity.Profiling.LowLevel.Unsafe;
 
 namespace Unity.Profiling.SystemMetrics

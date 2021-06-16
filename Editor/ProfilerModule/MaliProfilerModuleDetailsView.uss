@@ -1,0 +1,50 @@
+.section
+{
+	margin: 4px 8px;
+}
+
+.section-title-label
+{
+	-unity-font-style: bold;
+	margin: 4px 0px;
+}
+
+.row
+{
+	flex-direction: row;
+	padding: 2px 0px;
+	max-width: 600px;
+}
+
+.value-title-label
+{
+	width: 240px;
+}
+
+.value-label
+{
+	width: 80px;
+}
+
+.percent-value-element
+{
+	flex-direction: row;
+	flex-grow: 1;
+}
+
+.percent-value-label
+{
+	width: 80px;
+}
+
+.percent-value-bar
+{
+	background-color: #454545;
+	flex-grow: 1;
+}
+
+.percent-value-bar__fill
+{
+	background-color: #D2D2D2;
+	flex-grow: 1;
+}

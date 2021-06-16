@@ -1,0 +1,18 @@
+{
+    "name": "Unity.Profiling.Editor.SystemMetrics.Mali",
+    "rootNamespace": "",
+    "references": [
+        "GUID:dc3db18027862cd4b8608ab11a3fc164"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

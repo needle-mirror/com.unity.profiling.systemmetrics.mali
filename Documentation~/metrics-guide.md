@@ -1,36 +1,58 @@
 # Metrics provided by System Metrics Mali package
 
-| SystemMetricsMali property        | Counter name                           | Description                                                |
-|-----------------------------------|----------------------------------------|------------------------------------------------------------|
-| GpuActive                         | GPU Active Cycles                      | Number of cycles GPU was active |
-| GpuNonFragmentActive              | GPU Vertex And Compute Active Cycles   | Number of cycles GPU was busy with *vertex/compute* workload |
-| GpuFragmentActive                 | GPU Fragment Active Cycles             | Number of cycles GPU was busy with *fragment* workload |
-| GpuTilerActive                    | GPU Tiler Active Cycles                | Number of cycles GPU *tiler* was active |
-|                                   |                                        |                                                            |
-| GpuVertexComputeJobs              | GPU Vertex And Compute Jobs            | Number of vertex/compute jobs                              |
-| GpuTiles                          | GPU Tiles                              | Number of physical tiles written                           |
-| GpuTransactionEliminations        | GPU Transaction Eliminations           | Number of transaction eliminations                         |
-| GpuFragmentJobs                   | GPU Fragment Jobs                      | Number of fragment jobs                                    |
-| GpuPixels                         | GPU Pixels                             | Number of pixels shaded                                    |
-|                                   |                                        |                                                            |
-| GpuEarlyZTests                    | GPU Early Z Tests                      | Early-Z tests performed                                    |
-| GpuEarlyZKilled                   | GPU Early Z Killed                     | Early-Z tests resulting in a kill                          |
-| GpuLateZTests                     | GPU Late Z Tests                       | Late-Z tests performed                                     |
-| GpuLateZKilled                    | GPU Late Z Killed                      | Late-Z tests resulting in a kill                           |
-|                                   |                                        |                                                            |
-| GpuInstructions                   | GPU Instructions                       | Number of shader instructions                              |
-| GpuDivergedInstructions           | GPU Diverged Instructions              | Number of diverged shader instructions                     |
-|                                   |                                        |                                                            |
-| GpuShaderCycles                   | GPU Shader Cycles                      | Shader total cycles                                        |
-| GpuShaderArithmeticCycles         | GPU Shader Arithmetic Cycles           | Shader arithmetic cycles                                   |
-| GpuShaderLoadStoreCycles          | GPU Shader Load Store Cycles           | Shader load/store cycles                                   |
-| GpuShaderTextureCycles            | GPU Shader Texture Cycles              | Shader texture cycles                                      |
-|                                   |                                        |                                                            |
-| GpuCacheReadLookups               | GPU Cache Read Lookups                 | Cache read lookups                                         |
-| GpuCacheWriteLookups              | GPU Cache Write Lookups                | Cache write lookups                                        |
-| GpuExternalMemoryReadAccesses     | GPU External Memory Read Accesses      | Reads from external memory                                 |
-| GpuExternalMemoryWriteAccesses    | GPU External Memory Write Accesses     | Writes to external memory                                  |
-| GpuExternalMemoryReadStalls       | GPU External Memory Read Stalls        | Stalls when reading from external memory                   |
-| GpuExternalMemoryWriteStalls      | GPU External Memory Write Stalls       | Stalls when writing to external memory                     |
-| GpuExternalMemoryReadBytes        | GPU External Memory Read Bytes         | Bytes read to external memory                              |
-| GpuExternalMemoryWriteBytes       | GPU External Memory Write Bytes        | Bytes written to external memory                           |
+| SystemMetricsMali property     | Counter name                     | Description                                                  |
+| ------------------------------ | -------------------------------- | ------------------------------------------------------------ |
+| **GpuActive**                  | GPU Active Cycles                | The total amount of GPU processing load your application requests. <br/><br/>This counter increments every clock cycle that the GPU has any pending work in one of the following states: <br/> &#8226;Active, <br/> &#8226;Queued<br/> &#8226;Stalled <br/>These states count as **Active** time even if there is no forward progress. |
+| **GpuShaderCoreActive**        | Shader Core Active Cycles        | The number GPU clock cycles where the shader core processes at least one warp. <br/><br/>This counter does not provide detailed information about how the application uses the functional units inside the shader core. |
+| **GpuNonFragmentActive**       | Vertex And Compute Active Cycles | The number of GPU clock cycles where the GPU computes the following:<br/> &#8226;Vertex shaders <br/> &#8226;Tessellation shaders <br/> &#8226;Geometry shaders <br/> &#8226;Fixed function tiling <br/> &#8226;Compute shaders <br/><br/>This counter includes GPU cycles for the specified workloads even if the GPU is waiting for external memory to return data. This counts towards the processing load even though there is no forward progress. |
+| **GpuFragmentActive**          | Fragment Active Cycles           | The number of GPU clock cycles where the GPU calculates any type of fragment shader operation. <br/>This counter increments every clock cycle where the GPU has any operation present in the fragment queue.<br/><br/>This counter includes GPU cycles where Unity loads an operation into a queue even if the GPU is waiting for external memory to return data. This counts towards the processing load even though there is no forward progress.<br/><br/>For most content there are orders of magnitude more fragments than vertices, so this counter will usually be the highest processing load. |
+| **GpuTilerActive**             | Tiler Active Cycles              | The number of GPU clock cycles where the GPU tiler is active and has an operation queued for processing. |
+| **GpuShaderCoreUtilization**   | % Shader Core Utilization        | The percentage of time that the GPU shader core takes to process at least one warp.<br/><br/>This counter does not provide detailed information about how the application uses the functional units inside the shader core. |
+| **GpuNonFragmentUtilization**  | % Vertex And Compute Utilization | The percentage of time that the GPU shader core takes to compute the following:  <br/> &#8226;Vertex shaders, <br/> &#8226;Tessellation shaders<br/> &#8226;Geometry shaders <br/> &#8226;Fixed function tiling <br/> &#8226;Compute shaders<br/><br/>This counter includes GPU cycles for the specified workloads even if the GPU is waiting for external memory to return data. This counts towards the processing load even though there is no forward progress. |
+| **GpuFragmentUtilization**     | % Fragment Utilization           | The percentage of time that the GPU shader core takes to process fragment shaders.<br/><br/>This counter increments every clock cycle where the GPU has any operation present in the fragment queue. <br/><br/>This counter includes GPU cycles where Unity loads an operation into a queue even if the GPU is waiting for external memory to return data. This counts towards the processing load even though there is no forward progress.<br/><br/>Most data the GPU processes contains many more fragments than vertices. As a result, this counter usually has the highest processing load. |
+|                                |                                  |                                                              |
+| **GpuVertexComputeJobs**       | Vertex And Compute Jobs          | The number of vertex and compute jobs.                       |
+| **GpuTiles**                   | Tiles                            | The number of physical tiles Unity writes to the GPU.        |
+| **GpuTransactionEliminations** | Transaction Eliminations         | The number of transaction eliminations.                      |
+| **GpuFragmentJobs**            | Fragment Jobs                    | The number of fragment jobs.                                 |
+| **GpuPixels**                  | Pixels                           | The number of pixels the GPU shades.                         |
+|                                |                                  |                                                              |
+| **GpuEarlyZTests**             | Early Z Tests                    | The number of depth tests the GPU performs before it processes fragments. |
+| **GpuEarlyZKilled**            | Early Z Killed                   | The number of Early-Z tests that result in a kill.           |
+| **GpuLateZTests**              | Late Z Tests                     | The number of depth tests the GPU performs after it processes fragments. |
+| **GpuLateZKilled**             | Late Z Killed                    | The number of Late-Z tests that result in a kill.            |
+|                                |                                  |                                                              |
+| **GpuInstructions**            | Instructions                     | The number of shader instructions the GPU executes.          |
+| **GpuDivergedInstructions**    | Diverged Instructions            | The number of diverged shader instructions the GPU executes. |
+|                                |                                  |                                                              |
+| **GpuShaderArithmeticActive**  | Shader Arithmetic Cycles         | The number of GPU clock cycles where the Shader Core processes an arithmetic operation. |
+| **GpuShaderLoadStoreActive**   | Shader Load Store Cycles         | The number of cycles where the Shader Core processes a load or store operation. |
+| **GpuShaderTextureActive**     | Shader Texture Unit Cycles       | The number of GPU clock cycles where the Shader Core processes a Texture operation. |
+| **GpuShaderFragmentActive**    | Shader Fragment Cycles           | The number of GPU clock cycles where the Shader Core processes a fragment shader operation.<br/><br/>This counter includes all GPU clock cycles when at least one fragment task is active anywhere inside the shader core. This could include the fixed-function fragment front-end, the programmable tripipe execution core, and the fixed-function fragment backend. |
+| **GpuShaderComputeActive**     | Shader Compute Cycles            | The number of GPU clock cycles where the Shader Core actively processes a compute shader operation. <br/><br/>This counter increases whenever the Shader Core processes any compute operation. This includes any cycle that runs compute work in the fixed-function front-end or the in the programmable core. |
+| **GpuShaderTripipeActive**     | Shader Tri-Pipe Cycles           | The number of GPU clock cycles where the Shader Core processes a tripipe (Arithmetic/Load and Store/Texture) operation.<br/><br/> This counter does not describe the total resources the tripipe uses. It only indicates that something was running on the tripipe. |
+| **GpuShaderFragmentUtilization** | % Shader Fragment Utilization    | The total number of cycles the GPU uses the fragment pipeline.<br/><br/> This counter includes all GPU clock cycles when at least one fragment task is active anywhere inside the shader core. This could include the fixed-function fragment front-end, the programmable tripipe execution core, and the fixed-function fragment backend. |
+| **GpuShaderComputeUtilization** | % Shader Compute Utilization     | The total number of cycles the GPU uses the compute shader pipeline. <br/><br/>This counter increases whenever the Shader Core is processes any compute operation. This includes any GPU clock cycle where compute work runs anywhere in the fixed-function front-end or the in the programmable core. |
+| **GpuShaderTripipeUtilization** | % Shader Tri-Pipe Utilization    | The total number of cycles the GPU uses the tri-pipe (Arithmetic/Load and Store/Texture) pipeline.<br/><br/> This counter does not describe the total resources the tripipe uses. It only indicates that something was running on the tripipe. |
+| **GpuShaderArithmeticUtilization** | % Shader Arithmetic Utilization  | The total number of cycles the GPU uses the shader core arithmetic unit. <br/><br/>This counter increases whenever the shader core processes any arithmetic operations. This includes any GPU clock cycle where arithmetic work is running anywhere in the fixed-function front-end or the in the programmable core. |
+| **GpuShaderLoadStoreUtilization** | % Shader Load/Store Utilization  | The total number of cycles the GPU uses the oad/store cache unit. <br/><br/>This counter increase every GPU clock cycle where the GPU reads the load/store cache. |
+| **GpuShaderTextureUtilization**   | % Shader Texture Unit Utilization      | This counter indicates shader core texturing unit load. Different instructions might take more than one cycle due to multi-cycle data access and filtering operations:<br/> &#8226;2D bilinear filtering takes two cycles per quad.  <br/> &#8226;2D trilinear filtering takes four cycles per quad.  <br/> &#8226;3D bilinear filtering takes four cycles per quad.  <br/> &#8226;3D trilinear filtering takes eight cycles per quad. |
+|                                |                                  |                                                              |
+| **GpuCacheReadLookups**           | Cache Read Lookups                     | The number of cache read lookups the GPU performs.       |
+| **GpuCacheWriteLookups**          | Cache Write Lookups                    | The number of cache write lookups the GPU performs. |
+| **GpuExternalMemoryReadAccesses** | Memory Read Accesses                   | The number of time the GPU reads from external memory     |
+| **GpuExternalMemoryWriteAccesses** | Memory Write Accesses                  | The number of time the GPU writes to external memory      |
+| **GpuExternalMemoryReadStalls**   | Memory Read Stalls                     | The number of stalls when reading from external memory    |
+| **GpuExternalMemoryWriteStalls**  | Memory Write Stalls                    | The number of stalls when writing to external memory      |
+| **GpuExternalMemoryReadBytes**    | Memory Read Bytes                      | The number of bytes the GPU reads to external memory     |
+| **GpuExternalMemoryWriteBytes**   | Memory Write Bytes                     | The number of bytes the GPU writes to external memory        |
+| **GpuReadStallRate**              | % Memory Read Stalled                  | The percentage of cycles L2 cache is stalled waiting for data to be read from system memory. |
+| **GpuWriteStallRate**             | % Memory Write Stalled                 | The percentage of cycles L2 cache is stalled waiting for data to be written to system memory. |
+|                                   |                                        | |
+| **GpuInputPrimitives**            | Input Primitives                       | The number of input triangle primitives. |
+| **GpuCulledPrimitives**           | Culled Primitives                      | The number of primitives that the GPU culls. <br/>Unity culls a primitive if it is outside the visible region of the render surface. These primitives are ignored by the rasterizer. |
+| **GpuClippedPrimitives**          | Clipped Primitives                     | The number of primitives the GPU clips.<br/>For the GPU to clip a primitive, it must be partially inside and partially outside the viewport. |
+| **GpuVisiblePrimitives**          | Visible Primitives                     | The number of primitives that are visible after culling. |
+| **GpuCulledPrimitivesPercentage** | % Culled Primitives                    | The percentage of primitives that Unity culls. <br/>Unity culls a primitive if it is outside the visible region of the render surface. These primitives are ignored by the rasterizer. |
+| **GpuClippedPrimitivesPercentage** | % Clipped Primitives                   | The percentage of primitives the GPU clips.<br/>For the GPU to clip a primitive, it must be partially inside and partially outside the viewport. |
+| **GpuVisiblePrimitivesPercentage** | % Visible Primitives                   | The percentage of primitives that are visible after culling. |
