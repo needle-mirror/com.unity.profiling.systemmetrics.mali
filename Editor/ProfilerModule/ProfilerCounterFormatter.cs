@@ -1,6 +1,6 @@
 namespace Unity.Profiling.Editor.SystemMetrics.Mali
 {
-    public static class ProfilerCounterFormatter
+    internal static class ProfilerCounterFormatter
     {
         public static string FormatValue(in long data, ProfilerMarkerDataUnit unit)
         {

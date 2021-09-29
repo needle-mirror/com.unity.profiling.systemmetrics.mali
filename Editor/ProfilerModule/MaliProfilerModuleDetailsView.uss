@@ -16,7 +16,12 @@
 	max-width: 600px;
 }
 
-.value-title-label
+.counter-name-label
+{
+	width: 240px;
+}
+
+.non-backed-counter-name-label
 {
 	width: 240px;
 }

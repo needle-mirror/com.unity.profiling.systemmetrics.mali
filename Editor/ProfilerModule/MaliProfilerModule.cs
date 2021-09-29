@@ -1,73 +1,77 @@
+using Unity.Profiling.LowLevel.Unsafe;
+using Unity.Profiling.SystemMetrics;
+
 namespace Unity.Profiling.Editor.SystemMetrics.Mali
 {
     [System.Serializable]
     [ProfilerModuleMetadata("Mali System Metrics")]
-    public class MaliProfilerModule : ProfilerModule
+    internal class MaliProfilerModule : ProfilerModule
     {
-        // TODO Use final Mali counter category.
-        static readonly ProfilerCategory k_MaliProfilerCategory = ProfilerCategory.Scripts;
-
-        static readonly ProfilerCounterDescriptor[] k_ChartCounters = new ProfilerCounterDescriptor[]
+        static private ProfilerCounterDescriptor[] ChartCounters = new ProfilerCounterDescriptor[]
         {
-            new ProfilerCounterDescriptor("GPU Active Cycles", k_MaliProfilerCategory),
-            new ProfilerCounterDescriptor("GPU Vertex And Compute Active Cycles", k_MaliProfilerCategory),
-            new ProfilerCounterDescriptor("GPU Fragment Active Cycles", k_MaliProfilerCategory),
-            new ProfilerCounterDescriptor("GPU Tiler Active Cycles", k_MaliProfilerCategory),
+            GetDescriptorProfilerCounterHandle(SystemMetricsMali.Instance.GpuCycles),
+            GetDescriptorProfilerCounterHandle(SystemMetricsMali.Instance.GpuVertexAndComputeCycles),
+            GetDescriptorProfilerCounterHandle(SystemMetricsMali.Instance.GpuFragmentCycles),
+            GetDescriptorProfilerCounterHandle(SystemMetricsMali.Instance.GpuShaderCoreCycles),
         };
 
-        static readonly string[] k_DetailValueCounterNames = new string[]
+        static private ProfilerRecorderHandle[] DetailValueCounterNames = new ProfilerRecorderHandle[]
         {
-            "GPU Active Cycles",
-            "GPU Vertex And Compute Active Cycles",
-            "GPU Fragment Active Cycles",
-            "GPU Tiler Active Cycles",
+            SystemMetricsMali.Instance.GpuCycles,
+            SystemMetricsMali.Instance.GpuVertexAndComputeCycles,
+            SystemMetricsMali.Instance.GpuFragmentCycles,
 
-            "GPU Shader Cycles",
-            "GPU Shader Arithmetic Cycles",
-            "GPU Shader Load Store Cycles",
-            "GPU Shader Texture Cycles",
+            SystemMetricsMali.Instance.GpuShaderCoreCycles,
+            SystemMetricsMali.Instance.GpuShaderArithmeticCycles,
+            SystemMetricsMali.Instance.GpuShaderLoadStoreCycles,
+            SystemMetricsMali.Instance.GpuShaderTextureCycles,
 
-            "GPU Tiles",
-            "GPU Transaction Eliminations",
-            "GPU Pixels",
+            SystemMetricsMali.Instance.GpuTiles,
+            SystemMetricsMali.Instance.GpuUnchangedEliminatedTiles,
+            SystemMetricsMali.Instance.GpuPixels,
 
-            "GPU Cache Read Lookups",
-            "GPU External Memory Read Accesses",
-            "GPU External Memory Read Stalls",
-            "GPU External Memory Read Bytes",
+            SystemMetricsMali.Instance.GpuCacheReadLookups,
+            SystemMetricsMali.Instance.GpuMemoryReadAccesses,
+            SystemMetricsMali.Instance.GpuMemoryReadStalledCycles,
+            SystemMetricsMali.Instance.GpuMemoryReadBytes,
 
-            "GPU Cache Write Lookups",
-            "GPU External Memory Write Accesses",
-            "GPU External Memory Write Stalls",
-            "GPU External Memory Write Bytes",
+            SystemMetricsMali.Instance.GpuCacheWriteLookups,
+            SystemMetricsMali.Instance.GpuMemoryWriteAccesses,
+            SystemMetricsMali.Instance.GpuMemoryWriteStalledCycles,
+            SystemMetricsMali.Instance.GpuMemoryWriteBytes,
 
-            "GPU Early Z Tests",
-            "GPU Early Z Killed",
-            "GPU Late Z Tests",
-            "GPU Late Z Killed",
+            SystemMetricsMali.Instance.GpuEarlyZTests,
+            SystemMetricsMali.Instance.GpuEarlyZKills,
+            SystemMetricsMali.Instance.GpuLateZTests,
+            SystemMetricsMali.Instance.GpuLateZKills,
 
-            "GPU Instructions",
-            "GPU Diverged Instructions",
-            "GPU Vertex And Compute Jobs",
-            "GPU Fragment Jobs",
+            SystemMetricsMali.Instance.GpuInstructions,
+            SystemMetricsMali.Instance.GpuDivergedInstructions,
+            SystemMetricsMali.Instance.GpuVertexComputeJobs,
+            SystemMetricsMali.Instance.GpuFragmentJobs,
         };
 
-        static readonly System.Tuple<string, string>[] k_DetailPercentValueCounterNames = new System.Tuple<string, string>[]
+        static private ProfilerCounterDescriptor GetDescriptorProfilerCounterHandle(ProfilerRecorderHandle handle)
         {
-            new System.Tuple<string, string>(k_DetailValueCounterNames[1], k_DetailValueCounterNames[0]),
-            new System.Tuple<string, string>(k_DetailValueCounterNames[2], k_DetailValueCounterNames[0]),
-            new System.Tuple<string, string>(k_DetailValueCounterNames[3], k_DetailValueCounterNames[0]),
+            var description = ProfilerRecorderHandle.GetDescription(handle); 
+            return new ProfilerCounterDescriptor(description.Name, description.Category);
+        }
 
-            new System.Tuple<string, string>(k_DetailValueCounterNames[5], k_DetailValueCounterNames[4]),
-            new System.Tuple<string, string>(k_DetailValueCounterNames[6], k_DetailValueCounterNames[4]),
-            new System.Tuple<string, string>(k_DetailValueCounterNames[7], k_DetailValueCounterNames[4]),
+        static private System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>[] DetailPercentValueCounterNames = new System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>[]
+        {
+            new System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>(DetailValueCounterNames[1], DetailValueCounterNames[0]),
+            new System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>(DetailValueCounterNames[2], DetailValueCounterNames[0]),
+
+            new System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>(DetailValueCounterNames[4], DetailValueCounterNames[3]),
+            new System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>(DetailValueCounterNames[5], DetailValueCounterNames[3]),
+            new System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>(DetailValueCounterNames[6], DetailValueCounterNames[3]),
         };
 
-        public MaliProfilerModule() : base(k_ChartCounters) { }
+        public MaliProfilerModule() : base(ChartCounters) { }
 
         public override ProfilerModuleViewController CreateDetailsViewController()
         {
-            return new MaliProfilerModuleDetailsViewController(ProfilerWindow, k_DetailValueCounterNames, k_DetailPercentValueCounterNames);
+            return new MaliProfilerModuleDetailsViewController(ProfilerWindow, DetailValueCounterNames, DetailPercentValueCounterNames);
         }
     }
 }

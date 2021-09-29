@@ -1,11 +1,12 @@
 using System.Runtime.InteropServices;
 using Unity.Profiling.LowLevel.Unsafe;
+using UnityEngine;
 
 namespace Unity.Profiling.SystemMetrics
 {
     internal static class SystemMetricsLibHWCP
     {
-#if UNITY_ANDROID && !UNITY_EDITOR
+#if UNITY_ANDROID || UNITY_EDITOR
         [DllImport("AndroidHWCP")]
         public static extern bool IsActive();
 
@@ -33,6 +34,12 @@ namespace Unity.Profiling.SystemMetrics
         public static unsafe ProfilerRecorderHandle GetProfilerRecorderHandle(string id)
         {
             var handle = GetCounterHandle(id);
+#if UNITY_EDITOR
+            if (handle == 0)
+            {
+                Debug.LogWarning($"SystemMetrics: Failed to get handle for '{id}' id, check that native plugin id match");
+            }
+#endif
             return *((ProfilerRecorderHandle*)&handle);
         }
     }

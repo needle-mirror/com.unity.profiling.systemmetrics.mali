@@ -6,9 +6,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-namespace UnityEditor.Profiling.SystemMetrics
+namespace UnityEditor.Profiling.SystemMetrics.Tests
 {
-    public class PluginTests
+    internal class PluginTests
     {
         [Test]
         public void libAndroidHWCP_IsImported()

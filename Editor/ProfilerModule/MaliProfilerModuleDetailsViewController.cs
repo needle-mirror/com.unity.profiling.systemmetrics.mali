@@ -1,27 +1,34 @@
 using System.Collections.Generic;
+using Unity.Profiling.LowLevel.Unsafe;
+using Unity.Profiling.SystemMetrics;
 using UnityEditor;
 using UnityEditor.Profiling;
 using UnityEngine.UIElements;
 
 namespace Unity.Profiling.Editor.SystemMetrics.Mali
 {
-    public class MaliProfilerModuleDetailsViewController : ProfilerModuleViewController
+    internal class MaliProfilerModuleDetailsViewController : ProfilerModuleViewController
     {
         const string k_UxmlResourcePath = "Packages/com.unity.profiling.systemmetrics.mali/Editor/ProfilerModule/MaliProfilerModuleDetailsView.uxml";
         const string k_UxmlIdentifier_CyclesPerPixel_Label = "cycles-per-pixel__label";
         const string k_UxmlIdentifier_ZKillPercent_Label = "z-kill__label";
         const string k_UxmlIdentifier_ShaderParallelism_Label = "shader-parallelism__label";
 
-        string[] m_ValueCounters;
-        System.Tuple<string, string>[] m_PercentValueCounters;
-
+        // Each value counter in m_ValueCounters has a corresponding value-label and value-name-label for display.
+        ProfilerRecorderHandle[] m_ValueCounters;
         List<ValueLabel> m_ValueLabels;
+        List<Label> m_ValueNameLabels;
+
+        // Each percent-value counter in m_PercentValueCounters has a corresponding percent-value-element for display.
+        System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>[] m_PercentValueCounters;
         List<PercentValueElement> m_PercentValueElements;
+
+        // Derived (non-backed) statistics are not backed by a single counter and must be computed individually for display.
         Label m_CyclesPerPixelLabel;
         Label m_ZKillLabel;
         Label m_ShaderParallelismLabel;
 
-        public MaliProfilerModuleDetailsViewController(ProfilerWindow profilerWindow, string[] valueCounters, System.Tuple<string, string>[] percentValueCounters) : base(profilerWindow)
+        public MaliProfilerModuleDetailsViewController(ProfilerWindow profilerWindow, ProfilerRecorderHandle[] valueCounters, System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>[] percentValueCounters) : base(profilerWindow)
         {
             m_ValueCounters = valueCounters;
             m_PercentValueCounters = percentValueCounters;
@@ -53,6 +60,9 @@ namespace Unity.Profiling.Editor.SystemMetrics.Mali
             m_ValueLabels = view.Query<ValueLabel>().ToList();
             UnityEngine.Debug.Assert(m_ValueLabels.Count == m_ValueCounters.Length);
 
+            m_ValueNameLabels = view.Query<Label>(className: "counter-name-label").ToList();
+            UnityEngine.Debug.Assert(m_ValueNameLabels.Count == m_ValueCounters.Length);
+
             m_PercentValueElements = view.Query<PercentValueElement>().ToList();
             UnityEngine.Debug.Assert(m_PercentValueElements.Count == m_PercentValueCounters.Length);
 
@@ -81,57 +91,78 @@ namespace Unity.Profiling.Editor.SystemMetrics.Mali
             var selectedFrameIndexInt32 = System.Convert.ToInt32(ProfilerWindow.selectedFrameIndex);
             using (var frameDataView = UnityEditorInternal.ProfilerDriver.GetRawFrameDataView(selectedFrameIndexInt32, 0))
             {
-                if (frameDataView != null && frameDataView.valid)
+                var hasValidFrameDataView = (frameDataView != null && frameDataView.valid);
+
+                // Raw value statistics.
+                for (int i = 0; i < m_ValueCounters.Length; ++i)
                 {
-                    // Raw value statistics.
-                    for (int i = 0; i < m_ValueCounters.Length; ++i)
-                    {
-                        var counterName = m_ValueCounters[i];
-                        var counterValue = GetCounterValueAsLong(frameDataView, counterName);
-                        m_ValueLabels[i].SetValue(counterValue);
-                    }
+                    var counterId = m_ValueCounters[i];
+                    var counterValue = 0L;
+                    if (hasValidFrameDataView)
+                        counterValue = GetCounterValueAsLong(frameDataView, counterId);
+                    m_ValueLabels[i].SetValue(counterValue);
 
-                    // Percentage value statistics.
-                    for (int i = 0; i < m_PercentValueCounters.Length; ++i)
-                    {
-                        var counterNamePair = m_PercentValueCounters[i];
-                        var counterPercentage = GetCounterValueLongAsPercentageOfTotal(frameDataView, counterNamePair.Item1, counterNamePair.Item2);
-                        m_PercentValueElements[i].SetPercent(counterPercentage);
-                    }
+                    var counterDescription = ProfilerRecorderHandle.GetDescription(counterId);
+                    m_ValueNameLabels[i].text = counterDescription.Name;
+                }
 
-                    // Derived statistics.
-                    var cyclesPerPixel = (double)GetCounterValueAsLong(frameDataView, "GPU Active Cycles") / GetCounterValueAsLong(frameDataView, "GPU Pixels");
-                    m_CyclesPerPixelLabel.text = ProfilerCounterFormatter.FormatCount(cyclesPerPixel);
+                // Percentage value statistics.
+                for (int i = 0; i < m_PercentValueCounters.Length; ++i)
+                {
+                    var counterIdPair = m_PercentValueCounters[i];
+                    var counterPercentage = 0f;
+                    if (hasValidFrameDataView)
+                        counterPercentage = GetCounterValueLongAsPercentageOfTotal(frameDataView, counterIdPair.Item1, counterIdPair.Item2);
+                    m_PercentValueElements[i].SetPercent(counterPercentage);
+                }
 
-                    var zKillPercentage = 0f;
-                    var zTestCount = GetCounterValueAsLong(frameDataView, "GPU Early Z Tests") + GetCounterValueAsLong(frameDataView, "GPU Late Z Tests");
-                    var zTestKillsCount = GetCounterValueAsLong(frameDataView, "GPU Early Z Killed") + GetCounterValueAsLong(frameDataView, "GPU Late Z Killed");
+                // Derived/non-backed statistics.
+                var cyclesPerPixel = 0.0;
+                if (hasValidFrameDataView)
+                {
+                    var gpuPixels = GetCounterValueAsLong(frameDataView, SystemMetricsMali.Instance.GpuPixels);
+                    if (gpuPixels > 0)
+                        cyclesPerPixel = (double)GetCounterValueAsLong(frameDataView, SystemMetricsMali.Instance.GpuCycles) / gpuPixels;
+                }
+                m_CyclesPerPixelLabel.text = ProfilerCounterFormatter.FormatCount(cyclesPerPixel);
+
+                var zKillPercentage = 0f;
+                if (hasValidFrameDataView)
+                {
+                    var zTestCount = GetCounterValueAsLong(frameDataView, SystemMetricsMali.Instance.GpuEarlyZTests) + 
+                        GetCounterValueAsLong(frameDataView, SystemMetricsMali.Instance.GpuLateZTests);
+                    var zTestKillsCount = GetCounterValueAsLong(frameDataView, SystemMetricsMali.Instance.GpuEarlyZKills) + 
+                        GetCounterValueAsLong(frameDataView, SystemMetricsMali.Instance.GpuLateZKills);
                     if (zTestCount > 0)
                         zKillPercentage = zTestKillsCount * 100f / zTestCount;
-                    m_ZKillLabel.text = ProfilerCounterFormatter.FormatPercentage(zKillPercentage);
+                }
+                m_ZKillLabel.text = ProfilerCounterFormatter.FormatPercentage(zKillPercentage);
 
-                    var shaderParallelismPercentage = 0f;
-                    var gpuInstructions = GetCounterValueAsLong(frameDataView, "GPU Instructions");
+                var shaderParallelismPercentage = 0f;
+                if (hasValidFrameDataView)
+                {
+                    var gpuInstructions = GetCounterValueAsLong(frameDataView, SystemMetricsMali.Instance.GpuInstructions);
                     if (gpuInstructions > 0)
                     {
-                        var gpuNonDivergedInstructions = gpuInstructions - GetCounterValueAsLong(frameDataView, "GPU Diverged Instructions");
+                        var gpuNonDivergedInstructions = gpuInstructions - GetCounterValueAsLong(frameDataView, SystemMetricsMali.Instance.GpuDivergedInstructions);
                         shaderParallelismPercentage = gpuNonDivergedInstructions * 100f / gpuInstructions;
                     }
-                    m_ShaderParallelismLabel.text = ProfilerCounterFormatter.FormatPercentage(shaderParallelismPercentage);
                 }
+                m_ShaderParallelismLabel.text = ProfilerCounterFormatter.FormatPercentage(shaderParallelismPercentage);
             }
         }
 
-        long GetCounterValueAsLong(RawFrameDataView frameDataView, string counterName)
+        long GetCounterValueAsLong(RawFrameDataView frameDataView, ProfilerRecorderHandle counterId)
         {
-            var markerId = frameDataView.GetMarkerId(counterName);
+            var description = ProfilerRecorderHandle.GetDescription(counterId);
+            var markerId = frameDataView.GetMarkerId(description.Name);
             return frameDataView.GetCounterValueAsLong(markerId);
         }
 
-        float GetCounterValueLongAsPercentageOfTotal(RawFrameDataView frameDataView, string valueCounterName, string totalCounterName)
+        float GetCounterValueLongAsPercentageOfTotal(RawFrameDataView frameDataView, ProfilerRecorderHandle valueCounterId, ProfilerRecorderHandle totalCounterId)
         {
-            var value = GetCounterValueAsLong(frameDataView, valueCounterName);
-            var total = GetCounterValueAsLong(frameDataView, totalCounterName);
+            var value = GetCounterValueAsLong(frameDataView, valueCounterId);
+            var total = GetCounterValueAsLong(frameDataView, totalCounterId);
             if (total == 0)
                 return 0;
 

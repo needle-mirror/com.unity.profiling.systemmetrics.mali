@@ -1,8 +1,9 @@
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Unity.Profiling.Editor.SystemMetrics.Mali
 {
-    public class PercentValueElement : VisualElement
+    internal class PercentValueElement : VisualElement
     {
         Label m_Label;
         VisualElement m_BarFill;
@@ -24,7 +25,9 @@ namespace Unity.Profiling.Editor.SystemMetrics.Mali
         public void SetPercent(float percent)
         {
             m_Label.text = ProfilerCounterFormatter.FormatPercentage(percent);
-            m_BarFill.style.width = new Length(percent, LengthUnit.Percent);
+
+            var clampedPercent = Mathf.Clamp(percent, 0f, 100f);
+            m_BarFill.style.width = new Length(clampedPercent, LengthUnit.Percent);
         }
 
         public new class UxmlFactory : UxmlFactory<PercentValueElement> { }

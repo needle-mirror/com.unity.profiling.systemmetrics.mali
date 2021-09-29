@@ -1,70 +1,304 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using Unity.Profiling.LowLevel.Unsafe;
 using UnityEngine.LowLevel;
 
 namespace Unity.Profiling.SystemMetrics
 {
+    /// <summary>
+    /// System Metrics Mali class provides access to all Profiler Counters related to the device performance. You can
+    /// use exposed <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to create relevant <see cref="Unity.Profiling.ProfilerRecorder"/> to access
+    /// collected performance data.
+    /// </summary>
     public class SystemMetricsMali
     {
+        /// <summary>
+        /// Global SystemMetricsMali class instance to access hardware counters.
+        /// </summary>
         public static SystemMetricsMali Instance { get; private set; }
 
+        /// <summary>
+        /// Returns true if System Metrics Mali was initialized successfully, false otherwise.
+        /// This means that System Metrics Mali runs on a device that supports hardware counters.
+        /// </summary>
+        /// <value>True when System Metrics Mali is available, false otherwise.</value>
         public bool Active { get { return SystemMetricsLibHWCP.IsActive(); } }
 
-        public ProfilerRecorderHandle GpuActive { get; private set; }
-        public ProfilerRecorderHandle GpuShaderCoreActive { get; private set; }
-        public ProfilerRecorderHandle GpuNonFragmentActive { get; private set; }
-        public ProfilerRecorderHandle GpuFragmentActive { get; private set; }
-        public ProfilerRecorderHandle GpuTilerActive { get; private set; }
-        public ProfilerRecorderHandle GpuShaderCoreUtilization { get; private set; }
-        public ProfilerRecorderHandle GpuNonFragmentUtilization { get; private set; }
+        /// <summary>
+        /// Returns `GPU Active Cycles` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuCycles { get; private set; }
+
+        /// <summary>
+        /// Returns `Vertex And Compute Cycles` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuVertexAndComputeCycles { get; private set; }
+
+        /// <summary>
+        /// Returns `Vertex And Compute Utilization` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuVertexAndComputeUtilization { get; private set; }
+
+        /// <summary>
+        /// Returns `Fragment Cycles` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuFragmentCycles { get; private set; }
+
+        /// <summary>
+        /// Returns `Fragment Utilization` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
         public ProfilerRecorderHandle GpuFragmentUtilization { get; private set; }
 
-        public ProfilerRecorderHandle GpuVertexComputeJobs { get; private set; }
-        public ProfilerRecorderHandle GpuTiles { get; private set; }
-        public ProfilerRecorderHandle GpuTransactionEliminations { get; private set; }
-        public ProfilerRecorderHandle GpuFragmentJobs { get; private set; }
-        public ProfilerRecorderHandle GpuPixels { get; private set; }
+        /// <summary>
+        /// Returns `Shader Core Cycles` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuShaderCoreCycles { get; private set; }
 
-        public ProfilerRecorderHandle GpuEarlyZTests { get; private set; }
-        public ProfilerRecorderHandle GpuEarlyZKilled { get; private set; }
-        public ProfilerRecorderHandle GpuLateZTests { get; private set; }
-        public ProfilerRecorderHandle GpuLateZKilled { get; private set; }
+        /// <summary>
+        /// Returns `Shader Core Utilization` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuShaderCoreUtilization { get; private set; }
 
-        public ProfilerRecorderHandle GpuInstructions { get; private set; }
-        public ProfilerRecorderHandle GpuDivergedInstructions { get; private set; }
 
-        public ProfilerRecorderHandle GpuShaderArithmeticActive { get; private set; }
-        public ProfilerRecorderHandle GpuShaderLoadStoreActive { get; private set; }
-        public ProfilerRecorderHandle GpuShaderTextureUnitActive { get; private set; }
-        public ProfilerRecorderHandle GpuShaderFragmentActive { get; private set; }
-        public ProfilerRecorderHandle GpuShaderComputeActive { get; private set; }
-        public ProfilerRecorderHandle GpuShaderTripipeActive { get; private set; }
-        public ProfilerRecorderHandle GpuShaderFragmentUtilization { get; private set; }
+        /// <summary>
+        /// Returns `Input Primitives` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuInputPrimitives { get; private set; }
+
+        /// <summary>
+        /// Returns `Culled Primitives` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuCulledPrimitives { get; private set; }
+
+        /// <summary>
+        /// Returns `% Culled Primitives` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuCulledPrimitivesPercentage { get; private set; }
+
+        /// <summary>
+        /// Returns `Clipped Primitives` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuClippedPrimitives { get; private set; }
+
+        /// <summary>
+        /// Returns `% Clipped Primitives` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuClippedPrimitivesPercentage { get; private set; }
+
+        /// <summary>
+        /// Returns `Visible Primitives` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuVisiblePrimitives { get; private set; }
+
+        /// <summary>
+        /// Returns `% Visible Primitives` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuVisiblePrimitivesPercentage { get; private set; }
+
+
+        /// <summary>
+        /// Returns `Shader Fragment Cycles` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuShaderComputeCycles { get; private set; }
+
+        /// <summary>
+        /// Returns `Shader Fragment Utilization` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
         public ProfilerRecorderHandle GpuShaderComputeUtilization { get; private set; }
-        public ProfilerRecorderHandle GpuShaderTripipeUtilization { get; private set; }
+
+        /// <summary>
+        /// Returns `Shader Vertex And Compute Cycles` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuShaderFragmentCycles { get; private set; }
+
+        /// <summary>
+        /// Returns `Shader Vertex And Compute Utilization` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuShaderFragmentUtilization { get; private set; }
+
+        /// <summary>
+        /// Returns `Shader Arithmetic Cycles` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuShaderArithmeticCycles { get; private set; }
+
+        /// <summary>
+        /// Returns `Shader Arithmetic Utilization` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
         public ProfilerRecorderHandle GpuShaderArithmeticUtilization { get; private set; }
-        public ProfilerRecorderHandle GpuShaderLoadStoreUtilization { get; private set; }
+
+        /// <summary>
+        /// Returns `Shader Texture Cycles` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuShaderTextureCycles { get; private set; }
+
+        /// <summary>
+        /// Returns `Shader Texture Unit Utilization` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
         public ProfilerRecorderHandle GpuShaderTextureUtilization { get; private set; }
 
-        public ProfilerRecorderHandle GpuCacheReadLookups { get; private set; }
-        public ProfilerRecorderHandle GpuCacheWriteLookups { get; private set; }
-        public ProfilerRecorderHandle GpuMemoryReadAccesses { get; private set; }
-        public ProfilerRecorderHandle GpuMemoryWriteAccesses { get; private set; }
-        public ProfilerRecorderHandle GpuMemoryReadStalls { get; private set; }
-        public ProfilerRecorderHandle GpuMemoryWriteStalls { get; private set; }
-        public ProfilerRecorderHandle GpuMemoryReadBytes { get; private set; }
-        public ProfilerRecorderHandle GpuMemoryWriteBytes { get; private set; }
-        public ProfilerRecorderHandle GpuReadStallRate { get; private set; }
-        public ProfilerRecorderHandle GpuWriteStallRate { get; private set; }
+        /// <summary>
+        /// Returns `Shader Load/Store Cycles` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuShaderLoadStoreCycles { get; private set; }
 
-        public ProfilerRecorderHandle GpuInputPrimitives { get; private set; }
-        public ProfilerRecorderHandle GpuCulledPrimitives { get; private set; }
-        public ProfilerRecorderHandle GpuClippedPrimitives { get; private set; }
-        public ProfilerRecorderHandle GpuVisiblePrimitives { get; private set; }
-        public ProfilerRecorderHandle GpuCulledPrimitivesPercentage { get; private set; }
-        public ProfilerRecorderHandle GpuClippedPrimitivesPercentage { get; private set; }
-        public ProfilerRecorderHandle GpuVisiblePrimitivesPercentage { get; private set; }
+        /// <summary>
+        /// Returns `Shader Load/Store Utilization` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuShaderLoadStoreUtilization { get; private set; }
+
+
+        /// <summary>
+        /// Returns `Early ZS Tests` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuEarlyZTests { get; private set; }
+
+        /// <summary>
+        /// Returns `Early ZS Kills` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuEarlyZKills { get; private set; }
+
+        /// <summary>
+        /// Returns `Late ZS Tests` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuLateZTests { get; private set; }
+
+        /// <summary>
+        /// Returns `Late ZS Kills` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuLateZKills { get; private set; }
+
+
+        /// <summary>
+        /// Returns `Vertex And Compute Jobs` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuVertexComputeJobs { get; private set; }
+
+        /// <summary>
+        /// Returns `Fragment Jobs` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuFragmentJobs { get; private set; }
+
+        /// <summary>
+        /// Returns `Tiles` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuTiles { get; private set; }
+
+        /// <summary>
+        /// Returns `Unchanged Eliminated Tiles` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuUnchangedEliminatedTiles { get; private set; }
+
+        /// <summary>
+        /// Returns `Pixels` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuPixels { get; private set; }
+
+        /// <summary>
+        /// Returns `Instructions` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuInstructions { get; private set; }
+
+        /// <summary>
+        /// Returns `Diverged Instructions` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuDivergedInstructions { get; private set; }
+
+
+        /// <summary>
+        /// Returns `Cache Read Lookups` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuCacheReadLookups { get; private set; }
+
+        /// <summary>
+        /// Returns `Cache Write Lookups` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuCacheWriteLookups { get; private set; }
+
+        /// <summary>
+        /// Returns `Memory Read Accesses` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuMemoryReadAccesses { get; private set; }
+
+        /// <summary>
+        /// Returns `Memory Write Accesses` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuMemoryWriteAccesses { get; private set; }
+
+        /// <summary>
+        /// Returns `Memory Read Stalled Cycles` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuMemoryReadStalledCycles { get; private set; }
+
+        /// <summary>
+        /// Returns `% Memory Read Stalled` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuMemoryReadStallRate { get; private set; }
+
+        /// <summary>
+        /// Returns `Memory Write Stalled Cycles` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuMemoryWriteStalledCycles { get; private set; }
+
+        /// <summary>
+        /// Returns `% Memory Write Stalled` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuMemoryWriteStallRate { get; private set; }
+
+        /// <summary>
+        /// Returns `Memory Read Bytes` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuMemoryReadBytes { get; private set; }
+
+        /// <summary>
+        /// Returns `Memory Write Bytes` performance counter handler
+        /// </summary>
+        /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
+        public ProfilerRecorderHandle GpuMemoryWriteBytes { get; private set; }
 
         static SystemMetricsMali()
         {
@@ -73,6 +307,18 @@ namespace Unity.Profiling.SystemMetrics
 
         SystemMetricsMali()
         {
+            // Associate all properties with counter handles created in native plugin
+            var classType = this.GetType();
+            var properties = classType.GetProperties();
+            foreach (var propInfo in properties)
+            {
+                if (propInfo.PropertyType != typeof(ProfilerRecorderHandle))
+                    continue;
+
+                propInfo.SetValue(this, SystemMetricsLibHWCP.GetProfilerRecorderHandle(propInfo.Name));
+            }
+
+            // Don't do anything else on non-target platforms
             if (!SystemMetricsLibHWCP.IsActive())
                 return;
 
@@ -81,62 +327,6 @@ namespace Unity.Profiling.SystemMetrics
                 Debug.LogError("SystemMetricsMali: Failed to inject callback");
                 return;
             }
-
-            // Set properties only if initialization is successeful
-            GpuActive = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuActive));
-            GpuShaderCoreActive = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuShaderCoreActive));
-            GpuNonFragmentActive = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuNonFragmentActive));
-            GpuFragmentActive = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuFragmentActive));
-            GpuTilerActive = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuTilerActive));
-            GpuShaderCoreUtilization = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuShaderCoreUtilization));
-            GpuNonFragmentUtilization = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuNonFragmentUtilization));
-            GpuFragmentUtilization = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuFragmentUtilization));
-
-            GpuVertexComputeJobs = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuVertexComputeJobs));
-            GpuTiles = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuTiles));
-            GpuTransactionEliminations = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuTransactionEliminations));
-            GpuFragmentJobs = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuFragmentJobs));
-            GpuPixels = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuPixels));
-
-            GpuEarlyZTests = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuEarlyZTests));
-            GpuEarlyZKilled = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuEarlyZKilled));
-            GpuLateZTests = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuLateZTests));
-            GpuLateZKilled = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuLateZKilled));
-
-            GpuInstructions = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuInstructions));
-            GpuDivergedInstructions = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuDivergedInstructions));
-
-            GpuShaderArithmeticActive = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuShaderArithmeticActive));
-            GpuShaderLoadStoreActive = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuShaderLoadStoreActive));
-            GpuShaderTextureUnitActive = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuShaderTextureUnitActive));
-            GpuShaderFragmentActive = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuShaderFragmentActive));
-            GpuShaderComputeActive = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuShaderComputeActive));
-            GpuShaderTripipeActive = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuShaderTripipeActive));
-            GpuShaderFragmentUtilization = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuShaderFragmentUtilization));
-            GpuShaderComputeUtilization = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuShaderComputeUtilization));
-            GpuShaderTripipeUtilization = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuShaderTripipeUtilization));
-            GpuShaderArithmeticUtilization = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuShaderArithmeticUtilization));
-            GpuShaderLoadStoreUtilization = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuShaderLoadStoreUtilization));
-            GpuShaderTextureUtilization = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuShaderTextureUtilization));
-
-            GpuCacheReadLookups = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuCacheReadLookups));
-            GpuCacheWriteLookups = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuCacheWriteLookups));
-            GpuMemoryReadAccesses = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuMemoryReadAccesses));
-            GpuMemoryWriteAccesses = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuMemoryWriteAccesses));
-            GpuMemoryReadStalls = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuMemoryReadStalls));
-            GpuMemoryWriteStalls = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuMemoryWriteStalls));
-            GpuMemoryReadBytes = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuMemoryReadBytes));
-            GpuMemoryWriteBytes = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuMemoryWriteBytes));
-            GpuReadStallRate = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuReadStallRate));
-            GpuWriteStallRate = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuWriteStallRate));
-
-            GpuInputPrimitives = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuInputPrimitives));
-            GpuCulledPrimitives = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuCulledPrimitives));
-            GpuClippedPrimitives = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuClippedPrimitives));
-            GpuVisiblePrimitives = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuVisiblePrimitives));
-            GpuCulledPrimitivesPercentage = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuCulledPrimitivesPercentage));
-            GpuClippedPrimitivesPercentage = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuClippedPrimitivesPercentage));
-            GpuVisiblePrimitivesPercentage = SystemMetricsLibHWCP.GetProfilerRecorderHandle(nameof(GpuVisiblePrimitivesPercentage));
         }
 
         static bool InstallUpdateCallback()

@@ -7,45 +7,40 @@
 	<Style src="MaliProfilerModuleDetailsView.uss"/>
 	<engine:ScrollView>
 		<engine:VisualElement class="section">
-			<engine:Label text="GPU Active Cycles" class="section-title-label"/>
+			<engine:Label name="gpu-active-cycles__name-label" class="section-title-label counter-name-label"/>
 			<engine:VisualElement class="row">
-				<engine:Label text="Total" class="value-title-label"/>
-				<sysmetrics:ValueLabel name="gpu-active-cycles__label" class="value-label" unit="Count" tooltip="Number of cycles GPU was active."/>
+				<engine:Label text="Total" class="non-backed-counter-name-label" tooltip="This counter shows overall GPU processing load requested by the application. The counter increments every clock cycle that the GPU has any pending workload active, queued or stalled. Any of these states are counted as &quot;active&quot; time even if no forward progress was made."/>
+				<sysmetrics:ValueLabel name="gpu-active-cycles__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Vertex And Compute" class="value-title-label" tooltip="Number of cycles GPU was busy with vertex/compute workload."/>
+				<engine:Label name="vertex-and-compute-cycles__name-label" class="counter-name-label" tooltip="The number of GPU clock cycles where the GPU was busy computing one of the following: vertex shaders, tessellation shaders, geometry shaders, fixed function tiling, compute shaders. This counter will include GPU cycles for the specified workloads even if the GPU is stalled waiting for external memory to return data; this is still counted towards the load even though no forward progress is being made."/>
 				<sysmetrics:ValueLabel name="vertex-and-compute-cycles__label" class="value-label" unit="Count"/>
 				<sysmetrics:PercentValueElement name="vertex-and-compute-cycles-percentage" class="percent-value-element"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Fragment" class="value-title-label" tooltip="Number of cycles GPU was busy with fragment workload."/>
+				<engine:Label name="fragment-cycles__name-label" class="counter-name-label" tooltip="The number of GPU clock cycles where the GPU calculates any type of fragment shader operation. This counter increments every clock cycle where the GPU has any workload present in the fragment queue. This counter will include GPU cycles where a workload is loaded into a queue even if the GPU is stalled waiting for external memory to return data; this is still counted as active time even though no forward progress is being made. For most content there are orders of magnitude more fragments than vertices, so this counter will usually be the highest processing load."/>
 				<sysmetrics:ValueLabel name="fragment-cycles__label" class="value-label" unit="Count"/>
 				<sysmetrics:PercentValueElement name="fragment-cycles-percentage" class="percent-value-element"/>
 			</engine:VisualElement>
-			<engine:VisualElement class="row">
-				<engine:Label text="Tiler" class="value-title-label" tooltip="Number of cycles GPU tiler was active."/>
-				<sysmetrics:ValueLabel name="tiler-cycles__label" class="value-label" unit="Count"/>
-				<sysmetrics:PercentValueElement name="tiler-cycles-percentage" class="percent-value-element"/>
-			</engine:VisualElement>
 		</engine:VisualElement>
 		<engine:VisualElement class="section">
-			<engine:Label text="GPU Shader Cycles" class="section-title-label"/>
+			<engine:Label name="gpu-shader-cycles__name-label" class="section-title-label counter-name-label"/>
 			<engine:VisualElement class="row">
-				<engine:Label text="Total" class="value-title-label" tooltip="Total number of shader cycles."/>
+				<engine:Label text="Total" class="non-backed-counter-name-label" tooltip="The number of GPU clock cycles where the shader core processes at least one warp. Note that this counter does not provide detailed information about how the functional units are utilized inside the shader core, but simply gives an indication that something was running."/>
 				<sysmetrics:ValueLabel name="gpu-shader-cycles__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Arithmetic" class="value-title-label" tooltip="Number of shader arithmetic cycles."/>
+				<engine:Label name="arithmetic-cycles__name-label" class="counter-name-label" tooltip="The number of cycles shader core arithmetic unit was active. The counter increases whenever shader core is processing any arithmetic operations. Active processing includes any cycle where arithmetic work is running anywhere in the fixed-function front-end or in the programmable core."/>
 				<sysmetrics:ValueLabel name="arithmetic-cycles__label" class="value-label" unit="Count"/>
 				<sysmetrics:PercentValueElement name="arithmetic-cycles-percentage" class="percent-value-element"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Load/Store" class="value-title-label" tooltip="Number of shader load/store cycles."/>
+				<engine:Label name="load-store-cycles__name-label" class="counter-name-label" tooltip="The number of cycles shader core load/store cache unit was active. This counter increments for every load/store cache read."/>
 				<sysmetrics:ValueLabel name="load-store-cycles__label" class="value-label" unit="Count"/>
 				<sysmetrics:PercentValueElement name="load-store-cycles-percentage" class="percent-value-element"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Texture" class="value-title-label" tooltip="Number of shader texture cycles."/>
+				<engine:Label name="texture-cycles__name-label" class="counter-name-label" tooltip="The number of cycles shader core texturing unit was active. Different instructions might take more than one cycle due to multi-cycle data access and filtering operations:&#10;&#10;- 2D bilinear filtering takes two cycles per quad. &#10;- 2D trilinear filtering takes four cycles per quad. &#10;- 3D bilinear filtering takes four cycles per quad. &#10;- 3D trilinear filtering takes eight cycles per quad."/>
 				<sysmetrics:ValueLabel name="texture-cycles__label" class="value-label" unit="Count"/>
 				<sysmetrics:PercentValueElement name="texture-cycles-percentage" class="percent-value-element"/>
 			</engine:VisualElement>
@@ -53,102 +48,102 @@
 		<engine:VisualElement class="section">
 			<engine:Label text="Tiling" class="section-title-label"/>
 			<engine:VisualElement class="row">
-				<engine:Label text="Tiles" class="value-title-label" tooltip="Number of physical tiles written."/>
+				<engine:Label name="tiles__name-label" class="counter-name-label" tooltip="The number of physical tiles written by the GPU."/>
 				<sysmetrics:ValueLabel name="tiles__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Transaction Eliminations" class="value-title-label" tooltip="Number of transaction eliminations. This is the number of tiles eliminated from final rendering due to being identical to the previously rendered frame."/>
+				<engine:Label name="transaction-eliminations__name-label" class="counter-name-label" tooltip="The number of physical tile writes that are skipped because the content of the tile matches the content already in memory."/>
 				<sysmetrics:ValueLabel name="transaction-eliminations__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Pixels" class="value-title-label" tooltip="Number of pixels shaded."/>
+				<engine:Label name="pixels__name-label" class="counter-name-label" tooltip="The number of pixels the GPU shaded."/>
 				<sysmetrics:ValueLabel name="pixels__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Cycles Per Pixel" class="value-title-label" tooltip="Average number of GPU cycles spent per pixel rendered."/>
+				<engine:Label text="Cycles Per Pixel" class="non-backed-counter-name-label" tooltip="The average number of GPU cycles spent per pixel rendered."/>
 				<engine:Label name="cycles-per-pixel__label" class="value-label"/>
 			</engine:VisualElement>
 		</engine:VisualElement>
 		<engine:VisualElement class="section">
-			<engine:Label text="GPU Cache &amp; External Memory Usage" class="section-title-label"/>
+			<engine:Label text="GPU Cache And External Memory Usage" class="section-title-label"/>
 			<engine:VisualElement class="row">
-				<engine:Label text="Cache Read Lookups" class="value-title-label" tooltip="Number of cache read lookups."/>
+				<engine:Label name="cache-read-lookups__name-label" class="counter-name-label" tooltip="The number of cache read lookups the GPU performs."/>
 				<sysmetrics:ValueLabel name="cache-read-lookups__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="External Memory Read Accesses" class="value-title-label" tooltip="Number of reads from external memory."/>
+				<engine:Label name="external-memory-read-accesses__name-label" class="counter-name-label" tooltip="The number of times the GPU reads from external memory."/>
 				<sysmetrics:ValueLabel name="external-memory-read-accesses__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="External Memory Read Stalls" class="value-title-label" tooltip="Number of stalls when reading from external memory."/>
+				<engine:Label name="external-memory-read-stalls__name-label" class="counter-name-label" tooltip="The number of cycles L2 cache is stalled waiting for data to be read from system memory."/>
 				<sysmetrics:ValueLabel name="external-memory-read-stalls__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="External Memory Read Bytes" class="value-title-label" tooltip="Number of bytes read from external memory."/>
+				<engine:Label name="external-memory-read-bytes__name-label" class="counter-name-label" tooltip="The number of bytes the GPU reads from external memory."/>
 				<sysmetrics:ValueLabel name="external-memory-read-bytes__label" class="value-label" unit="Bytes"/>
 			</engine:VisualElement>
 		</engine:VisualElement>
 		<engine:VisualElement class="section">
 			<engine:VisualElement class="row">
-				<engine:Label text="Cache Write Lookups" class="value-title-label" tooltip="Number of cache write lookups."/>
+				<engine:Label name="cache-write-lookups__name-label" class="counter-name-label" tooltip="The number of cache write lookups the GPU performs."/>
 				<sysmetrics:ValueLabel name="cache-write-lookups__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="External Memory Write Accesses" class="value-title-label" tooltip="Number of writes to external memory."/>
+				<engine:Label name="external-memory-write-accesses__name-label" class="counter-name-label" tooltip="The number of times the GPU writes to external memory."/>
 				<sysmetrics:ValueLabel name="external-memory-write-accesses__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="External Memory Write Stalls" class="value-title-label" tooltip="Number of stalls when writing to external memory."/>
+				<engine:Label name="external-memory-write-stalls__name-label" class="counter-name-label" tooltip="The number of cycles L2 cache is stalled waiting for data to be written to system memory."/>
 				<sysmetrics:ValueLabel name="external-memory-write-stalls__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="External Memory Write Bytes" class="value-title-label" tooltip="Number of bytes written to external memory."/>
+				<engine:Label name="external-memory-write-bytes__name-label" class="counter-name-label" tooltip="The number of bytes the GPU writes to external memory."/>
 				<sysmetrics:ValueLabel name="external-memory-write-bytes__label" class="value-label" unit="Bytes"/>
 			</engine:VisualElement>
 		</engine:VisualElement>
 		<engine:VisualElement class="section">
 			<engine:Label text="GPU Z Tests" class="section-title-label"/>
 			<engine:VisualElement class="row">
-				<engine:Label text="Early Z Tests" class="value-title-label" tooltip="Number of early-Z tests performed."/>
+				<engine:Label name="early-z-tests__name-label" class="counter-name-label" tooltip="The number of depth and/or stencil tests performed before fragments processing."/>
 				<sysmetrics:ValueLabel name="early-z-tests__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Early Z Kills" class="value-title-label" tooltip="Number of early-Z tests resulting in a kill."/>
+				<engine:Label name="early-z-kills__name-label" class="counter-name-label" tooltip="The number of depth and/or stencil tests performed before fragments processing that resulted in a kill."/>
 				<sysmetrics:ValueLabel name="early-z-kills__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Late Z Tests" class="value-title-label" tooltip="Number of late-Z tests performed.."/>
+				<engine:Label name="late-z-tests__name-label" class="counter-name-label" tooltip="The number of depth and/or stencil tests performed after fragments processing."/>
 				<sysmetrics:ValueLabel name="late-z-tests__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Late Z Kills" class="value-title-label" tooltip="Number of late-Z tests resulting in a kill."/>
+				<engine:Label name="late-z-kills__name-label" class="counter-name-label" tooltip="The number of depth and/or stencil tests performed after fragments processing that resulted in a kill."/>
 				<sysmetrics:ValueLabel name="late-z-kills__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Z Kill Percentage" class="value-title-label" tooltip="Percentage of Z tests resulting in a kill."/>
+				<engine:Label text="All Z Tests Kill Percentage" class="non-backed-counter-name-label" tooltip="The percentage of all Z tests resulting in a kill."/>
 				<engine:Label name="z-kill__label" class="value-label"/>
 			</engine:VisualElement>
 		</engine:VisualElement>
 		<engine:VisualElement class="section">
-			<engine:Label text="Shader Instructions &amp; Jobs" class="section-title-label"/>
+			<engine:Label text="Shader Instructions And Jobs" class="section-title-label"/>
 			<engine:VisualElement class="row">
-				<engine:Label text="Instructions" class="value-title-label" tooltip="Number of shader instructions."/>
+				<engine:Label name="instructions__name-label" class="counter-name-label" tooltip="The number of shader instructions the GPU executes."/>
 				<sysmetrics:ValueLabel name="instructions__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Diverged Instructions" class="value-title-label" tooltip="Number of diverged shader instructions."/>
+				<engine:Label name="diverged-instructions__name-label" class="counter-name-label" tooltip="The number of diverged shader instructions the GPU executes."/>
 				<sysmetrics:ValueLabel name="diverged-instructions__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Vertex And Compute Jobs" class="value-title-label" tooltip="Number of vertex/compute jobs."/>
+				<engine:Label name="vertex-and-compute-jobs__name-label" class="counter-name-label" tooltip="The number of vertex and compute jobs executed."/>
 				<sysmetrics:ValueLabel name="vertex-and-compute-jobs__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Fragment Jobs" class="value-title-label" tooltip="Number of fragment jobs."/>
+				<engine:Label name="fragment-jobs__name-label" class="counter-name-label" tooltip="The number of fragment jobs executed."/>
 				<sysmetrics:ValueLabel name="fragment-jobs__label" class="value-label" unit="Count"/>
 			</engine:VisualElement>
 			<engine:VisualElement class="row">
-				<engine:Label text="Shader Parallelism" class="value-title-label" tooltip="Percentage of shader instructions that did not diverge."/>
+				<engine:Label text="Shader Parallelism" class="non-backed-counter-name-label" tooltip="The percentage of shader instructions that did not diverge."/>
 				<engine:Label name="shader-parallelism__label" class="value-label"/>
 			</engine:VisualElement>
 		</engine:VisualElement>

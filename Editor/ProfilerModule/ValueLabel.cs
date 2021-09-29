@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 namespace Unity.Profiling.Editor.SystemMetrics.Mali
 {
-    public class ValueLabel : Label
+    internal class ValueLabel : Label
     {
         public ProfilerMarkerDataUnit Unit { get; private set; }
 
