@@ -4,6 +4,9 @@ The System Metrics Mali package allows you to access low-level system or hardwar
 - Access the same metrics using Recorder API in runtime and adjust graphics quality based on the current bottleneck.
 - Automate performance testing, by collecting extensive performance measurements with your continuous integration test runs.
 
+The System Metrics Mali package includes a Profiler Module for monitoring low-level GPU metrics in the Unity Profiler window.
+![Mali System Metrics Profiler Module](Images/usage-guide__profiler-module.png)<br/>*Mali System Metrics Profiler Module.*
+
 ## Installation
 
 You can install the package in one of the following ways:

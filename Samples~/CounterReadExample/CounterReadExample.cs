@@ -1,6 +1,4 @@
 using UnityEngine;
-using Unity.Profiling;
-using Unity.Profiling.SystemMetrics;
 
 namespace Unity.Profiling.SystemMetrics
 {
@@ -9,16 +7,16 @@ namespace Unity.Profiling.SystemMetrics
     /// </summary>
     public class CounterReadExample : MonoBehaviour
     {
-        private ProfilerRecorder m_GpuActiveRecorder;
+        private ProfilerRecorder m_GpuCyclesRecorder;
 
         private GUIStyle m_Style;
 
         private void OnEnable()
         {
             // Create and activate recorder
-            m_GpuActiveRecorder = new ProfilerRecorder(SystemMetricsMali.Instance.GpuActive);
-            if (m_GpuActiveRecorder.Valid)
-                m_GpuActiveRecorder.Start();
+            m_GpuCyclesRecorder = new ProfilerRecorder(SystemMetricsMali.Instance.GpuCycles);
+            if (m_GpuCyclesRecorder.Valid)
+                m_GpuCyclesRecorder.Start();
 
             // UI Style for data visualization
             m_Style = new GUIStyle();
@@ -29,14 +27,14 @@ namespace Unity.Profiling.SystemMetrics
         private void OnDisable()
         {
             // Deactivate and destroy
-            if (m_GpuActiveRecorder.Valid)
-                m_GpuActiveRecorder.Stop();
-            m_GpuActiveRecorder.Dispose();
+            if (m_GpuCyclesRecorder.Valid)
+                m_GpuCyclesRecorder.Stop();
+            m_GpuCyclesRecorder.Dispose();
         }
 
         void OnGUI()
         {
-            string reportMsg = $"GpuActive {m_GpuActiveRecorder.LastValue} / {m_GpuActiveRecorder.IsRunning}";
+            string reportMsg = $"GpuCycles {m_GpuCyclesRecorder.LastValue} / {m_GpuCyclesRecorder.IsRunning}";
 
             GUI.color = new Color(1, 1, 1, 1);
             float offset = 50;
