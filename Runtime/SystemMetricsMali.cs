@@ -300,6 +300,13 @@ namespace Unity.Profiling.SystemMetrics
         /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
         public ProfilerRecorderHandle GpuMemoryWriteBytes { get; private set; }
 
+        [RuntimeInitializeOnLoadMethod]
+        static void InitializeSystemMetricsMali()
+        {
+            if (!SystemMetricsMali.Instance.Active)
+                Debug.Log("SystemMetricsMali: Initialization failed");
+        }
+
         static SystemMetricsMali()
         {
             Instance = new SystemMetricsMali();
