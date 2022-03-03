@@ -1,31 +1,32 @@
-# Usage Guide
+# Using System Metrics Mali
 
-## Profiler Module
-The System Metrics Mali package includes a Profiler Module for monitoring low-level GPU metrics in the Unity Profiler window.
+## View data through the preconfigured Profiler module
 
-![Mali System Metrics Profiler Module](Images/usage-guide__profiler-module.png)<br/>*Mali System Metrics Profiler Module.*
+The System Metrics Mali package includes a Profiler module to monitor low-level GPU metrics in the Unity Profiler window.
 
-> After installing the package, the Mali System Metrics Profiler module will be available in the Profiler window. If it is not visible, you can enable it from the modules dropdown in the Profiler window.
+The chart view in the System Metrics Mali Profiler Module displays a high level overview of how the GPU distributed its processing load.
 
-The Mali System Metrics module uses its chart view to display a high level overview of where the GPU processing load was spent.
+In the module’s Details view, you can see more detailed information about the currently selected frame, such as information about Tiling, Memory Usage, Z Tests, and Shader Instructions. For descriptions of the individual counters, hover over their name to see a tooltip or see [Metrics Guide](metrics-guide.md).
 
-In the module’s Details view, you can see more detailed information about the currently selected frame, such as information about Tiling, Memory Usage, Z Tests, and Shader Instructions. For descriptions of the individual counters, hover over their name to see a tooltip or refer to the [Metrics Guide](metrics-guide.md).
+## Build a customized module in the Module Editor
 
-## Module Editor
-Using the [Module Editor](https://docs.unity3d.com/Manual/profiler-module-editor.html), you can quickly build custom Profiler modules directly in the Editor that use the Mali stats. This allows you, for example, to display additional Mali metrics in a Profiler chart, including alongside other built-in or custom Profiler counters.
+Use the [Profiler Module Editor](https://docs.unity3d.com/Manual/profiler-module-editor.html) to build Profiler modules directly in the Editor that use the Mali stats. This module can display additional Mali metrics in a Profiler chart, alongside other built-in or custom Profiler counters.
 
-![Module Editor](Images/usage-guide__module-editor.png)<br/>*Module Editor.*
+Connect the Profiler to a Mali GPU device and [capture some profiling data](https://docs.unity3d.com/Manual/profiler-profiling-applications.html) before you open the Profiler Module Editor. If you open the Profiler Module Editor window first, the Mali metrics counters don't appear in the **Available Counters** menu.
 
-> If you don't see the Mali counters in the list of **Available Counters**, ensure that the Profiler is connected to a Mali device and has captured Profiling data prior to opening the Module Editor.
+> Modules you create with the Module Editor aren't part of your Unity project and only appear in your local Editor. To define a custom Profiler Module that's available for all project users, see [Custom Profiler Module](#custom-profiler-module).
 
-![Module Editor Module](Images/usage-guide__module-editor-module.png)<br/>*Module Editor Module.*
+![Module Editor Module](Images/usage-guide__module-editor-module.png)<br/>*The Mali Shader Usage module.*
 
 > Note that modules created via the Module Editor are not part of the Project and will therefore only appear in your local Editor. To define a custom Profiler module in the Project, which makes it available for all Project users, please see [Custom Profiler Module](#custom-profiler-module) below.
 
-## Custom Profiler Module
-Using the [Profiler Extensibility API](https://docs.unity3d.com/Manual/customizing-profiler-module.html), you can define a custom Profiler module that uses the Mali counters. This allows you, for example, to mix-and-match the Mali metrics with other built-in or custom Profiler counters in one module, or to implement some bespoke visualization using the Mali performance data.
+<a name="custom-profiler-module"></a>
 
-The below example shows how you might combine the Mali metrics with custom [Profiler Counters](https://docs.unity3d.com/Packages/com.unity.profiling.core@latest/index.html?subfolder=/manual/profilercounter-guide.html) to correlate the metrics on a single chart.
+## Create a new Custom Profiler Module
+
+Use the [Profiler Extensibility API](https://docs.unity3d.com/Manual/customizing-profiler-module.html) to define a custom Profiler module that uses the Mali counters. You can use this to mix-and-match the Mali metrics with other built-in or custom Profiler counters in one module, or to implement some bespoke visualization using the Mali performance data.
+
+The following example uses the Mali metrics alongside custom [Profiler Counters](https://docs.unity3d.com/Packages/com.unity.profiling.core@latest/index.html?subfolder=/manual/profilercounter-guide.html) to correlate the metrics on a single chart.
 
 ![Custom Profiler Module](Images/usage-guide__custom-module.png)<br/>*Custom Profiler Module.*
 
@@ -56,16 +57,15 @@ public class MaliTanksProfilerModule : ProfilerModule
 }
 ```
 
-Please see the [Profiler Extensibility documentation](https://docs.unity3d.com/Manual/customizing-profiler-module.html) for more information.
+## Access the Profiler counters through code
 
-## Scripting API Usage
-All metrics in the System Metrics Mali package are implemented as [Profiler Counters](https://docs.unity3d.com/Packages/com.unity.profiling.core@latest/index.html?subfolder=/manual/profilercounter-guide.html) and can therefore be obtained from script via the [ProfilerRecorder API](https://docs.unity3d.com/ScriptReference/Unity.Profiling.ProfilerRecorder.html).
+The System Metrics Mali package implements all of its metrics as [Profiler Counters](https://docs.unity3d.com/Packages/com.unity.profiling.core@latest/index.html?subfolder=/manual/profilercounter-guide.html). You can access them through a script using the [ProfilerRecorder API](https://docs.unity3d.com/ScriptReference/Unity.Profiling.ProfilerRecorder.html).
 
-The below example shows how you might use the [ProfilerRecorder API](https://docs.unity3d.com/ScriptReference/Unity.Profiling.ProfilerRecorder.html) to monitor some Mali metrics in-game by displaying them on the screen, including from within a Release build without the Profiler attached.
+The following example uses the [ProfilerRecorder API](https://docs.unity3d.com/ScriptReference/Unity.Profiling.ProfilerRecorder.html) to display some Mali metrics in-game on the screen, including from within a Release build without the Profiler attached.
 
 ![In-game display](Images/usage-guide__hud.png)<br/>*In-game display.*
 
-```c#
+```csharp
 using System.Collections.Generic;
 using System.Text;
 using Unity.Profiling;
