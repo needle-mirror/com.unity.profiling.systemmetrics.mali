@@ -1,8 +1,10 @@
-﻿using System.Reflection;
-using System.Runtime.InteropServices;
+﻿using System;
 using UnityEngine;
 using Unity.Profiling.LowLevel.Unsafe;
 using UnityEngine.LowLevel;
+using UnityEngine.Scripting;
+
+[assembly: AlwaysLinkAssembly]
 
 namespace Unity.Profiling.SystemMetrics
 {
@@ -300,6 +302,7 @@ namespace Unity.Profiling.SystemMetrics
         /// <value>Use <see cref="Unity.Profiling.LowLevel.Unsafe.ProfilerRecorderHandle"/> to access counter data with <see cref="Unity.Profiling.ProfilerRecorder"/>.</value>
         public ProfilerRecorderHandle GpuMemoryWriteBytes { get; private set; }
 
+        [Preserve]
         [RuntimeInitializeOnLoadMethod]
         static void InitializeSystemMetricsMali()
         {
@@ -339,49 +342,55 @@ namespace Unity.Profiling.SystemMetrics
         static bool InstallUpdateCallback()
         {
             var root = PlayerLoop.GetCurrentPlayerLoop();
-            var injectionPoint = typeof(UnityEngine.PlayerLoop.PreLateUpdate);
-            var res = InjectPlayerLoopCallback(ref root, injectionPoint, SystemMetricsLibHWCP.Sample);
+            var injectAfter = typeof(UnityEngine.PlayerLoop.PreLateUpdate);
+            var res = InjectPlayerLoopCallback(ref root, injectAfter, SystemMetricsLibHWCP.Sample);
             PlayerLoop.SetPlayerLoop(root);
             return res;
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        delegate uint PlayerLoopDelegate();
+        private struct SystemMetricsPlayerLoopUpdateSystem {};
 
-        static bool InjectPlayerLoopCallback(ref PlayerLoopSystem system, System.Type injectedSystem, PlayerLoopSystem.UpdateFunction injectedFnc)
+        static bool InjectPlayerLoopCallback(ref PlayerLoopSystem rootSystem, System.Type injectAfter, PlayerLoopSystem.UpdateFunction injectedFnc)
         {
-            // Have we found the system we're looking for?
-            if (system.type == injectedSystem)
-            {
-                // If system has updateFunction set, updateDelegate won't be called
-                // We wrap native update function in something we can call in c#
-                // Reset updateFunction and call wrapped updateFunction in our delegate
-                PlayerLoopDelegate systemDelegate = null;
-                if (system.updateFunction.ToInt64() != 0)
-                {
-                    var intPtr = Marshal.ReadIntPtr(system.updateFunction);
-                    if (intPtr.ToInt64() != 0)
-                        systemDelegate = (PlayerLoopDelegate)Marshal.GetDelegateForFunctionPointer(intPtr, typeof(PlayerLoopDelegate));
-                }
+            if (rootSystem.subSystemList == null)
+                return false;
 
-                // Install the new delegate and keep the system function call
-                system.updateDelegate = () => { injectedFnc(); if (systemDelegate != null) systemDelegate(); };
-                system.updateFunction = new System.IntPtr(0);
+            var insertAfterIndex = Array.FindIndex(rootSystem.subSystemList, x => x.type == injectAfter);
+            if (insertAfterIndex >= 0)
+            {
+                // Check if we're not already injected
+                if (Array.IndexOf(rootSystem.subSystemList, typeof(SystemMetricsPlayerLoopUpdateSystem)) > 0)
+                    return true;
+
+                InsertAt(ref rootSystem.subSystemList, insertAfterIndex, new PlayerLoopSystem
+                {
+                    type = typeof(SystemMetricsPlayerLoopUpdateSystem),
+                    updateDelegate = injectedFnc
+                });
 
                 return true;
             }
 
-            if (system.subSystemList == null)
-                return false;
-
             // Iterate all subsystems
-            for (int i = 0; i < system.subSystemList.Length; ++i)
+            for (int i = 0; i < rootSystem.subSystemList.Length; ++i)
             {
-                if (InjectPlayerLoopCallback(ref system.subSystemList[i], injectedSystem, injectedFnc))
+                if (InjectPlayerLoopCallback(ref rootSystem.subSystemList[i], injectAfter, injectedFnc))
                     return true;
             }
 
             return false;
+        }
+
+        static void InsertAt<TValue>(ref TValue[] array, int index, TValue value)
+        {
+            var oldLength = array.Length;
+            Array.Resize(ref array, oldLength + 1);
+
+            // Make room for element.
+            if (index != oldLength)
+                Array.Copy(array, index, array, index + 1, oldLength - index);
+
+            array[index] = value;
         }
     }
 }
