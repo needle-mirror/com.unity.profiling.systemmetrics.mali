@@ -3,7 +3,10 @@ using UnityEngine.UIElements;
 
 namespace Unity.Profiling.Editor.SystemMetrics.Mali
 {
-    internal class PercentValueElement : VisualElement
+    #if UNITY_6000_0_OR_NEWER
+    [UxmlElement]
+    #endif
+    internal partial class PercentValueElement : VisualElement
     {
         Label m_Label;
         VisualElement m_BarFill;
@@ -30,6 +33,8 @@ namespace Unity.Profiling.Editor.SystemMetrics.Mali
             m_BarFill.style.width = new Length(clampedPercent, LengthUnit.Percent);
         }
 
+        #if !UNITY_6000_0_OR_NEWER
         public new class UxmlFactory : UxmlFactory<PercentValueElement> { }
+        #endif
     }
 }
