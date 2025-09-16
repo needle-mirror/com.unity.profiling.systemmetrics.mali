@@ -21,6 +21,6 @@ The System Metrics Mali package has following limitations:
 
 # Resources
 For more information, please have a look at:
-* [Package documentation page](https://docs.unity3d.com/Packages/com.unity.profiling.systemmetrics.mali@0.1/changelog/CHANGELOG.html)
-* [Mali Performance Counters documentation](https://community.arm.com/developer/tools-software/graphics/b/blog/posts/mali-midgard-family-performance-counters)
-* [HWCP library documentation page](https://github.com/ARM-software/HWCPipe)
+* [Package documentation page](https://docs.unity3d.com/Packages/com.unity.profiling.systemmetrics.mali@1.0/changelog/CHANGELOG.html)
+* [Mali Performance Counters documentation](https://community.arm.com/arm-community-blogs/b/mobile-graphics-and-gaming-blog/posts/mali-midgard-family-performance-counters)
+* [libGPUCounters library documentation page](https://github.com/ARM-software/libGPUCounters)

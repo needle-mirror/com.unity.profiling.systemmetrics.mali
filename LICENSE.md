@@ -1,4 +1,4 @@
-System Metrics Mali copyright © 2021 Unity Technologies
+System Metrics Mali copyright © 2025 Unity Technologies
 
 Licensed under the Unity Companion License for Unity-dependent projects (see https://unity3d.com/legal/licenses/unity_companion_license).
 

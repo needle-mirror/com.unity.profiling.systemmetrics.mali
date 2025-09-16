@@ -4,6 +4,23 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.1.0-pre.1] - 2025-09-16
+
+### Changed
+- Updgraded to HWCPipe2 (libGpucounters) 2.4.0 library
+- Updated coutners documentation based on the ARM guidelines
+- Support for 16KB page sizes
+
+### Added
+- Added `SystemMetricsMali.GetAvailableCounters()` runtime counter discovery API to get available Mali GPU counters on specific devices
+- Added new GPU performance counter properties:
+  - `GpuCyclesPerPixels` - GPU cycles spent per pixel for efficiency analysis
+  - `GpuVertexQueueActiveCycles` - Vertex processing queue active cycles for granular vertex workload analysis
+  - `GpuVertexQueueUtilization` - Vertex queue utilization percentage for vertex bottleneck identification
+  - `GpuComputeQueueActiveCycles` - Compute processing queue active cycles for compute shader analysis
+  - `GpuComputeQueueUtilization` - Compute queue utilization percentage for compute bottleneck identification
+- Added tooltips for the new counters to Profiler Module UI
+
 ## [1.0.3] - 2024-08-27
 ### Added
 - Added Windows Arm64 Editor library

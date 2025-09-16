@@ -16,9 +16,9 @@ apiRules:
         uid: System.ObsoleteAttribute
       type: Type
   - exclude:
-      uidRegex: Tests$
+      uidRegex: ^Tests$
       type: Namespace
   - exclude:
       # Samples
-      uidRegex: ^Unity.Profiling.SystemMetrics.*Example$
+      uidRegex: ^Unity\.Profiling\.SystemMetrics.*Example$
       type: Type

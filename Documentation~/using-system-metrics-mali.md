@@ -43,6 +43,8 @@ public class MaliTanksProfilerModule : ProfilerModule
         GetDescriptorProfilerCounterHandle(SystemMetricsMali.Instance.GpuCycles),
         GetDescriptorProfilerCounterHandle(SystemMetricsMali.Instance.GpuVertexAndComputeCycles),
         GetDescriptorProfilerCounterHandle(SystemMetricsMali.Instance.GpuFragmentCycles),
+        GetDescriptorProfilerCounterHandle(SystemMetricsMali.Instance.GpuShaderCoreUtilization),
+        GetDescriptorProfilerCounterHandle(SystemMetricsMali.Instance.GpuMemoryReadBytes),
         new ProfilerCounterDescriptor("Tank Count", Complete.GameStats.TanksProfilerCategory.Name),
         new ProfilerCounterDescriptor("Bullet Count", Complete.GameStats.TanksProfilerCategory.Name),
     };
@@ -60,6 +62,8 @@ public class MaliTanksProfilerModule : ProfilerModule
 ## Access the Profiler counters through code
 
 The System Metrics Mali package implements all of its metrics as [Profiler Counters](https://docs.unity3d.com/Packages/com.unity.profiling.core@latest/index.html?subfolder=/manual/profilercounter-guide.html). You can access them through a script using the [ProfilerRecorder API](https://docs.unity3d.com/ScriptReference/Unity.Profiling.ProfilerRecorder.html).
+
+All Mali counters belong to the same ProfilerCategory, which you can access via `SystemMetricsMali.Instance.Category`.
 
 The following example uses the [ProfilerRecorder API](https://docs.unity3d.com/ScriptReference/Unity.Profiling.ProfilerRecorder.html) to display some Mali metrics in-game on the screen, including from within a Release build without the Profiler attached.
 
@@ -149,6 +153,58 @@ public class MaliHUD : MonoBehaviour
 
         public string Name { get; }
         public ProfilerRecorder Recorder { get; }
+    }
+}
+```
+
+## Discover available counters at runtime
+
+You can also discover which Mali counters are available on a specific device at runtime using the `GetAvailableCounters` method. This is useful when you want to adapt your profiling based on the specific Mali GPU capabilities.
+
+```csharp
+using System.Collections.Generic;
+using Unity.Profiling;
+using Unity.Profiling.LowLevel.Unsafe;
+using Unity.Profiling.SystemMetrics;
+using UnityEngine;
+
+public class MaliCounterDiscovery : MonoBehaviour
+{
+    void Start()
+    {
+        if (!SystemMetricsMali.Instance.Active)
+        {
+            Debug.Log("Mali counters not available on this device");
+            return;
+        }
+
+        // Get all available counters on this device
+        var availableCounters = new List<ProfilerRecorderHandle>();
+        SystemMetricsMali.Instance.GetAvailableCounters(availableCounters);
+
+        Debug.Log($"Found {availableCounters.Count} available Mali counters:");
+
+        foreach (var handle in availableCounters)
+        {
+            var description = ProfilerRecorderHandle.GetDescription(handle);
+            Debug.Log($"- {description.Name} (Category: {description.Category})");
+        }
+
+        // Create recorders for all available counters
+        var recorders = new List<ProfilerRecorder>();
+        foreach (var handle in availableCounters)
+        {
+            var recorder = new ProfilerRecorder(handle);
+            if (recorder.Valid)
+            {
+                recorder.Start();
+                recorders.Add(recorder);
+            }
+        }
+
+        // Use the recorders to collect data...
+        // Remember to dispose them when done:
+        // foreach (var recorder in recorders) recorder.Dispose();
     }
 }
 ```

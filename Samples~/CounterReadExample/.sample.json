@@ -1,5 +1,0 @@
-{
-	"displayName":"Reading of a single GPU counter",
-	"description": "Example shows how to create and associate ProfilerRecorder with a GPU counter, how to read data from the counter and how to dispose it after use.",
-	"createSeparatePackage": false
-}

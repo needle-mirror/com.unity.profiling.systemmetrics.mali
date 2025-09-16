@@ -12,33 +12,42 @@ namespace Unity.Profiling.Editor.SystemMetrics.Mali
             GetDescriptorProfilerCounterHandle(SystemMetricsMali.Instance.GpuCycles),
             GetDescriptorProfilerCounterHandle(SystemMetricsMali.Instance.GpuVertexAndComputeCycles),
             GetDescriptorProfilerCounterHandle(SystemMetricsMali.Instance.GpuFragmentCycles),
-            GetDescriptorProfilerCounterHandle(SystemMetricsMali.Instance.GpuShaderCoreCycles),
+            GetDescriptorProfilerCounterHandle(SystemMetricsMali.Instance.GpuVertexQueueActiveCycles),
+            GetDescriptorProfilerCounterHandle(SystemMetricsMali.Instance.GpuComputeQueueActiveCycles),
         };
 
         static private ProfilerRecorderHandle[] DetailValueCounterNames = new ProfilerRecorderHandle[]
         {
             SystemMetricsMali.Instance.GpuCycles,
-            SystemMetricsMali.Instance.GpuVertexAndComputeCycles,
             SystemMetricsMali.Instance.GpuFragmentCycles,
+            SystemMetricsMali.Instance.GpuVertexAndComputeCycles,
+            SystemMetricsMali.Instance.GpuVertexQueueActiveCycles,
+            SystemMetricsMali.Instance.GpuComputeQueueActiveCycles,
+            SystemMetricsMali.Instance.GpuTilerCycles,
 
             SystemMetricsMali.Instance.GpuShaderCoreCycles,
             SystemMetricsMali.Instance.GpuShaderArithmeticCycles,
             SystemMetricsMali.Instance.GpuShaderLoadStoreCycles,
             SystemMetricsMali.Instance.GpuShaderTextureCycles,
+            SystemMetricsMali.Instance.GpuFragmentFPKActiveCycles,
 
             SystemMetricsMali.Instance.GpuTiles,
             SystemMetricsMali.Instance.GpuUnchangedEliminatedTiles,
             SystemMetricsMali.Instance.GpuPixels,
+            SystemMetricsMali.Instance.GpuCyclesPerPixels,
 
             SystemMetricsMali.Instance.GpuCacheReadLookups,
             SystemMetricsMali.Instance.GpuMemoryReadAccesses,
-            SystemMetricsMali.Instance.GpuMemoryReadStalledCycles,
             SystemMetricsMali.Instance.GpuMemoryReadBytes,
+            SystemMetricsMali.Instance.GpuMemoryReadStalledCycles,
 
             SystemMetricsMali.Instance.GpuCacheWriteLookups,
             SystemMetricsMali.Instance.GpuMemoryWriteAccesses,
-            SystemMetricsMali.Instance.GpuMemoryWriteStalledCycles,
             SystemMetricsMali.Instance.GpuMemoryWriteBytes,
+            SystemMetricsMali.Instance.GpuMemoryWriteStalledCycles,
+
+            SystemMetricsMali.Instance.GpuInputPrimitives,
+            SystemMetricsMali.Instance.GpuVisiblePrimitives,
 
             SystemMetricsMali.Instance.GpuEarlyZTests,
             SystemMetricsMali.Instance.GpuEarlyZKills,
@@ -53,18 +62,27 @@ namespace Unity.Profiling.Editor.SystemMetrics.Mali
 
         static private ProfilerCounterDescriptor GetDescriptorProfilerCounterHandle(ProfilerRecorderHandle handle)
         {
-            var description = ProfilerRecorderHandle.GetDescription(handle); 
+            var description = ProfilerRecorderHandle.GetDescription(handle);
             return new ProfilerCounterDescriptor(description.Name, description.Category);
         }
 
-        static private System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>[] DetailPercentValueCounterNames = new System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>[]
+        static private ProfilerRecorderHandle[] DetailPercentValueCounterNames = new ProfilerRecorderHandle[]
         {
-            new System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>(DetailValueCounterNames[1], DetailValueCounterNames[0]),
-            new System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>(DetailValueCounterNames[2], DetailValueCounterNames[0]),
+            SystemMetricsMali.Instance.GpuFragmentUtilization,
+            SystemMetricsMali.Instance.GpuVertexAndComputeUtilization,
+            SystemMetricsMali.Instance.GpuVertexQueueUtilization,
+            SystemMetricsMali.Instance.GpuComputeQueueUtilization,
+            SystemMetricsMali.Instance.GpuTilerUtilization,
 
-            new System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>(DetailValueCounterNames[4], DetailValueCounterNames[3]),
-            new System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>(DetailValueCounterNames[5], DetailValueCounterNames[3]),
-            new System.Tuple<ProfilerRecorderHandle, ProfilerRecorderHandle>(DetailValueCounterNames[6], DetailValueCounterNames[3]),
+            SystemMetricsMali.Instance.GpuShaderCoreUtilization,
+            SystemMetricsMali.Instance.GpuShaderArithmeticUtilization,
+            SystemMetricsMali.Instance.GpuShaderLoadStoreUtilization,
+            SystemMetricsMali.Instance.GpuShaderTextureUtilization,
+
+            SystemMetricsMali.Instance.GpuMemoryReadStallRate,
+            SystemMetricsMali.Instance.GpuMemoryWriteStallRate,
+
+            SystemMetricsMali.Instance.GpuVisiblePrimitivesPercentage,
         };
 
         public MaliProfilerModule() : base(ChartCounters) { }
